@@ -1,0 +1,1 @@
+web_static project - here, we learnt to manipulate html and css
