@@ -3,16 +3,21 @@
 import json
 import os
 from datetime import datetime
-#from models.base_model import BaseModel
+from models.base_model import BaseModel
 
 class FileStorage:
         
     __file_path = "file.json"
     __objects = {}
     
-    def all(self):
-        return self.__objects
-    
+    def all(self, cls=None):
+        if cls is None:
+            return self.__objects
+        else:
+            cls_name = cls.__name__
+            filtered_objects = {key: obj for key, obj in self.__objects.items() if key.startswith(cls_name)}
+            return filtered_objects
+
     def new(self, obj):
         key = f"{obj.__class__.__name__}.{obj.id}" 
         self.__objects[key] = obj
@@ -42,13 +47,26 @@ class FileStorage:
 
     
     def reload(self):
-        if os.path.exists(self.__file_path):
-            with open(self.__file_path, "r") as file:
-                the_dict = json.load(file)
-                for key, value in the_dict.items():
-                    cls_name, obj_id = key.split('.')
-                    if cls_name in self.classes():
-                        self.__objects[key] = self.classes()[cls_name](**value)
-
-
+        try:
+            if os.path.exists(self.__file_path):
+                with open(self.__file_path, "r") as file:
+                    the_dict = json.load(file)
+                    for key, value in the_dict.items():
+                        cls_name, obj_id = key.split('.')
+                        if cls_name in self.classes():
+                            self.__objects[key] = self.classes()[cls_name](**value)
+        except FileNotFoundError:
+            pass
+        except json.JSONDecodeError:
+            print("error: json file is corrupted")
     
+    def delete(self, obj=None):
+        if obj == None:
+            return
+        key = f"{obj.__class__.__name__}.{obj.id}" 
+        self.__objects[key]
+        if key in self.__objects:
+            del self.__objects[key]
+            print("deleted")
+        else:
+            print("what's going on")

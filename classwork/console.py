@@ -101,16 +101,43 @@ class GogoConsole(cmd.Cmd):
 
     def do_create(self, arg):
         command = shlex.split(arg)
+
+    
         if len(command) == 0:
             print("** class name missing **")
         elif command[0] not in self.classes:
             print("** class doesn't exist **")
         else:
             new_instance = self.classes[command[0]]()
-            new_instance.save()
+           # new_instance.save()
+           # object = storage.all()
+           # key = f"{command[0]}.{new_instance.id}"
+           # obj = object[key]
+            
+            for param in command[1:]:
+                key_value = param.split("=", 1)
+                k, v = key_value
+                k = k.replace('_', ' ')
+                v = self.parse_value(v)
+                setattr(new_instance, k, v)
             print(new_instance.id)
+            new_instance.save()
+            # obj.save()
 
 
+    def parse_value(self, value):
+        if value.startswith('"') and value.endswith('"'):
+            value = value[1:-1].replace('_', ' ').replace('\\"', '"')
+            return value
+    
+        else:
+            try:
+                if '.' in value:
+                    return float(value)
+                return int(value)
+            except ValueError:
+                return value
+            
     def do_show(self, arg):
         command = shlex.split(arg)
         if len(command) == 0:
