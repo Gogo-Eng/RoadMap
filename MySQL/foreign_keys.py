@@ -27,7 +27,8 @@ for x, user in enumerate(users):
 db.commit()
 
 mycursor.execute("SELECT * FROM Scores")
-for i in mycursor:
+everything = mycursor.fetchall() 
+for i in everything:
     print(i)
 
 mycursor.execute("SELECT * FROM Users")
