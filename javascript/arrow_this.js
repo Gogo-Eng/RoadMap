@@ -7,4 +7,3 @@ function myFunc() {
 }
 
 const instance = new myFunc();
-cd 
